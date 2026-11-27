@@ -23,7 +23,7 @@
 <main>
   <section aria-label="Материалы">
     <h2>Материалы</h2>
-    <div class="row"><span>доступны ученикам</span><div class="control"><button class="link" id="start">с момента регистрации</button><span id="materialSeparator" class="separator">, срок —</span><button class="link" id="materialAccess" aria-label="Срок доступа к материалам">по типу группы</button></div></div>
+    <div class="row"><span>доступны ученикам</span><div class="control"><button class="link" id="start">с момента регистрации</button><span id="materialSeparator" class="separator">· срок —</span><button class="link" id="materialAccess" aria-label="Срок доступа к материалам">по типу группы</button></div></div>
     <div class="row"><span>открываются</span><div class="control"><button class="link" id="opening">сразу</button><button class="link hidden" id="advance">после отправки на проверку</button></div></div>
     <div class="row"><span>отображаются по умолчанию</span><div class="control"><button class="link" id="display">в режиме списка</button></div></div>
     <div class="row hidden" id="unavailableRow"><span>недоступные</span><div class="control"><button class="link" id="unavailable">отображать серым</button></div></div>
@@ -72,7 +72,7 @@
   function close(){if(anchor)anchor.setAttribute('aria-expanded','false');anchor=null;openRule=null;pop.classList.remove('open');pop.replaceChildren()}
   function open(trigger,build,access=false){if(anchor===trigger){close();return}close();anchor=trigger;trigger.setAttribute('aria-expanded','true');pop.classList.toggle('access',access);pop.classList.add('open');build();position()}
   function selectedOption(text,active,fn){return button('option'+(active?' active':''),text,fn)}
-  function updateLabels(){for(const key of Object.keys(resources)){let p=state[key],b=$(key+'Access');b.textContent=p.mode==='group'?'по типу группы':key==='material'?'навсегда':'всегда';b.title=p.mode==='group'?'Бессрочные: '+ruleText(p,'endless')+'; с периодом: '+ruleText(p,'finite'):''}$('materialSeparator').textContent=state.material.mode==='group'?', срок —':'и'}
+  function updateLabels(){for(const key of Object.keys(resources)){let p=state[key],b=$(key+'Access');b.textContent=p.mode==='group'?'по типу группы':key==='material'?'навсегда':'всегда';b.title=p.mode==='group'?'Бессрочные: '+ruleText(p,'endless')+'; с периодом: '+ruleText(p,'finite'):''}$('materialSeparator').textContent=state.material.mode==='group'?'· срок —':'и'}
   function ruleText(p,kind){const value=p[kind];return rules[kind].find(x=>x[0]===value)[1].replace('N',String(value==='after'?p.afterDays:p.enrollDays))}
 
   function renderAccess(key){
@@ -86,7 +86,7 @@
         const block=create('div','rule-block');block.append(create('div','rule-label',kind==='endless'?'В бессрочных группах':'В группах с периодом обучения'));
         const val=create('div','rule-value'),value=p[kind],timed=value==='enroll'||value==='after';
         if(timed){const days=create('input','days');days.type='number';days.min='1';days.max='36500';days.step='1';let field=value==='enroll'?'enrollDays':'afterDays';days.value=p[field];days.setAttribute('aria-label',resources[key].label+': количество дней, '+(kind==='endless'?'бессрочная группа':'группа с периодом'));days.addEventListener('input',()=>{if(days.validity.valid&&days.value!==''){p[field]=Number(days.value);updateLabels();update()}});days.addEventListener('blur',()=>days.value=p[field]);val.append(days)}
-        let label=rules[kind].find(x=>x[0]===value)[1].replace('N ','');const ruleButton=button('link',label,()=>{openRule=openRule===kind?null:kind;renderAccess(key);position()});ruleButton.setAttribute('aria-expanded',String(openRule===kind));ruleButton.setAttribute('aria-label','Правило: '+(kind==='endless'?'бессрочная группа':'группа с периодом обучения'));val.append(ruleButton);block.append(val);
+        let label=value==='after'?'дней после окончания обучения':rules[kind].find(x=>x[0]===value)[1].replace('N ','');const ruleButton=button('link',label,()=>{openRule=openRule===kind?null:kind;renderAccess(key);position()});ruleButton.setAttribute('aria-expanded',String(openRule===kind));ruleButton.setAttribute('aria-label','Правило: '+(kind==='endless'?'бессрочная группа':'группа с периодом обучения'));val.append(ruleButton);block.append(val);
         if(openRule===kind){const list=create('div','rule-options');for(const [v,label] of rules[kind])list.append(selectedOption(label.replace('N',String(v==='after'?p.afterDays:p.enrollDays)),v===value,()=>{p[kind]=v;openRule=null;updateLabels();update();renderAccess(key);position()}));block.append(list)}
         wrap.append(block);
       }
